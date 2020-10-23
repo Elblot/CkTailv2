@@ -134,7 +134,7 @@ public class Event {
 
 	//only for our cases
 	public boolean isReq() {
-		if (!this.toString().contains("esponse") & !this.toString().contains("Resp") & !isInter()) {
+		if (!this.toString().contains("esponse") & !this.toString().contains("Resp") & !this.toString().contains("resp") & !isInter()) {
 			//System.out.println(this);
 			return true;
 		}
@@ -144,7 +144,7 @@ public class Event {
 	}
 
 	public boolean isResp() {
-		if (this.toString().contains("esponse") | this.toString().contains("Resp")) {
+		if (this.toString().contains("esponse") | this.toString().contains("Resp") | this.toString().contains("resp")) {
 			return true;
 		}
 		else {

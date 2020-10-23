@@ -21,7 +21,7 @@ public class MainSplit {
 	public static Trace trace;
 	public static Regex regex;
 	public static Trace logOrigin;
-	public static double interval = 1000.0;//in milliseconds 
+	public static double interval = 5000.0;//in milliseconds 
 	//public static double fact = 10.0;
 
 	public static Dependency Dep;
@@ -132,6 +132,7 @@ public class MainSplit {
 				LReq = C3(SR, aj);
 				if (LReq != null /*&& haveResp(trace.subTrace(i, trace.size()), LReq.get(LReq.size() - 1), aj)*/) {
 					//System.out.println("case 3 : " + aj.debug());
+					checkDependencies(tprime, aj); //make dep if not done
 					tprime.addEvent(aj);
 					LReq.add(aj);
 					SA.add(aj.getFrom());
@@ -382,7 +383,8 @@ public class MainSplit {
 		Trace sub = logOrigin.subTrace(0,logOrigin.indexOf(aj));//
 		ArrayList<Event> dependency = new ArrayList<Event>();
 		int c = 0;
-		ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
+		//ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
+		ArrayList<Event> begin = new ArrayList<Event>();
 		begin.add(aj);
 		for (@SuppressWarnings("unused") Event e: begin) {
 			ArrayList<Event> dep = checkDependencies(sub, aj, chain);//
@@ -397,7 +399,7 @@ public class MainSplit {
 		if (c == 1 && t.containsAll(dependency) && !aj.getTo().equals(dependency.get(0).getFrom())) {
 			if (!aj.isInter()) {
 				//System.out.println("haj:" + aj.toString());
-				//System.out.println("here:" + dependency.toString());
+				System.out.println("here:" + dependency.toString());
 				ArrayList<String> ld = new ArrayList<String>();
 				ld.add(aj.getTo());
 				ld.add(dependency.get(0).getFrom());
@@ -416,7 +418,8 @@ public class MainSplit {
 		Trace sub = origin.subTrace(0,origin.indexOf(aj));//
 		ArrayList<Event> dependency = new ArrayList<Event>();
 		int c = 0;
-		ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
+		//ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
+		ArrayList<Event> begin = new ArrayList<Event>();
 		begin.add(aj);
 		for (@SuppressWarnings("unused") Event e: begin) {
 			ArrayList<Event> dep = checkDependencies(sub, aj, chain);//
@@ -431,7 +434,6 @@ public class MainSplit {
 		if (c == 1 && t.containsAll(dependency) && !aj.getTo().equals(dependency.get(0).getFrom())) {
 			if (!aj.isInter()) {
 				//System.out.println("haj:" + aj.toString());
-				//System.out.println("here:" + dependency.toString());
 				ArrayList<String> ld = new ArrayList<String>();
 				ld.add(aj.getTo());
 				ld.add(dependency.get(0).getFrom());
