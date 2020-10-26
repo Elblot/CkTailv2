@@ -42,6 +42,8 @@ import traces.Statement;
 
 
 /**
+ * from CARE
+ * 
  * This class is used to export / import FSA in format supported by Graphviz visualization tool.
  * @author tewfik ziaidi
  * @author sylvain lamprier

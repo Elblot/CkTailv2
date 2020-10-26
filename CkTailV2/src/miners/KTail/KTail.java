@@ -38,7 +38,7 @@ import traces.Trace;
  * KTail miner
  * 
  * original @author Sylvain Lamprier
- * fixed and modified by Elliott Blot
+ * fixed and modified by Blot Elliott
  *
  */
 public class KTail {
@@ -161,12 +161,6 @@ public class KTail {
 			}
 			/***** cyclic: the last state merge with the initial state*****/		
 			for (int j = 1; j<=horizon;j++) {
-				/*if (size >= j) {
-					thorizon.add(t.getByIndex(j));
-				}
-				else {
-					thorizon.add(t.getByIndex(1));
-				}*/
 				thorizon.add(new Statement(new Method("end")));
 				Statement first=thorizon.remove(0);
 				StateNode stnode = new StateNode();
@@ -181,7 +175,7 @@ public class KTail {
 				last_node=stnode;
 			}
 		}
-
+		/** Build the FSA **/
 		FSA fsa=new FSA();
 		fsa.addStates(new ArrayList<State>(all_states));
 		fsa.setInitialState(source);

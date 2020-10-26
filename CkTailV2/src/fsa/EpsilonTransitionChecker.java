@@ -21,6 +21,11 @@
  
 package fsa;
 
+/**
+ * from Care
+ * @author 
+ *
+ */
 public class EpsilonTransitionChecker{
 	public static String EPSILON = "";
 

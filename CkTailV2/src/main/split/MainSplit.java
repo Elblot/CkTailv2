@@ -10,6 +10,11 @@ import dependencies.Dependency;
 import model.Event;
 import model.Trace;
 
+/**
+ * @author Blot Elliott
+ *
+ */
+
 public class MainSplit {
 
 	public static String log;
@@ -27,6 +32,7 @@ public class MainSplit {
 	public static Dependency Dep;
 
 	public static void main(String[] args) {
+		//parse the log
 		final long timebuildingTraces1 = System.currentTimeMillis();
 		ArrayList<Trace> T = new ArrayList<Trace>();
 		means = new HashMap<String, Double>();
@@ -39,20 +45,22 @@ public class MainSplit {
 		trace = new Trace(new File(log), regex);
 		System.out.println("traces built");
 		final long timebuildingTraces2 = System.currentTimeMillis();
+
+		//split the log and detect sessions
 		final long timesplit1 = System.currentTimeMillis();
 		Dep = new Dependency();
 		logOrigin = trace;
-		System.out.println("mode :" + mode);
+		System.out.println("mode: " + mode);
 		if (mode.equals("classic")) {
-			System.out.println("mode classic");
 			T.addAll(Split(trace));
 		}
 		else if (mode.equals("id")) {
-			System.out.println("mode id");
 			T.addAll(SplitID(trace));
 		}
 		System.out.println("split done");
 		final long timesplit2 = System.currentTimeMillis();
+
+		//write the traces in files
 		final long timegenfile1 = System.currentTimeMillis();
 		int i = 1;
 		File dir = new File(output);
@@ -69,28 +77,37 @@ public class MainSplit {
 			e.printStackTrace();
 		}
 		final long timegenfile2 = System.currentTimeMillis();
+
+		//build the dependency graphs.
 		final long timedag1 = System.currentTimeMillis();
 		Dep.buildDAG(output);
-
-		System.out.println("Dep : " + Dep.toString());
-		System.out.println("DAG :\n " + Dep.getDag());
+		/*System.out.println("Dep : " + Dep.toString());
+		System.out.println("DAG :\n " + Dep.getDag());*/
 		System.out.println("Files generated");
 		final long timedag2 = System.currentTimeMillis();
-		System.out.println("building Traces: " + (timebuildingTraces2 - timebuildingTraces1) + " ms");
-		System.out.println("split: " + (timesplit2 - timesplit1) + " ms");
-		System.out.println("file generation: " + (timegenfile2 - timegenfile1) + " ms");
-		System.out.println("dag generation: " + (timedag2 - timedag1) + " ms");
-		System.out.println("Total: " + (timedag2 + timesplit2 + timebuildingTraces2 + timegenfile2 - timegenfile1 -  timebuildingTraces1 - timesplit1 - timedag1) + " ms");
+
+		if(timerMode) {
+			System.out.println("building Traces: " + (timebuildingTraces2 - timebuildingTraces1) + " ms");
+			System.out.println("split: " + (timesplit2 - timesplit1) + " ms");
+			System.out.println("file generation: " + (timegenfile2 - timegenfile1) + " ms");
+			System.out.println("dag generation: " + (timedag2 - timedag1) + " ms");
+			System.out.println("Total: " + (timedag2 + timesplit2 + timebuildingTraces2 + timegenfile2 - timegenfile1 -  timebuildingTraces1 - timesplit1 - timedag1) + " ms");
+		}
 	}
 
+	/**
+	 * Algorithm Split that extract the traces of session and build the dependency lists.
+	 * This algorithm is used when no session identifier is present in the events.
+	 * (mode: classic). 
+	 */
 	public static ArrayList<Trace> Split(Trace trace){
 		ArrayList<Trace> T = new ArrayList<Trace>();
 		int i = 1;
 		Event aj = trace.getEvent(i - 1);
 		while(aj.isResp()) {
-			System.out.println("not a req: " + aj.debug());
+			System.out.println("first event is not a req: " + aj.debug());
 			i++;
-			if (i >= trace.size()) {
+			if (i >= trace.getSize()) {
 				return T;
 			}
 			aj = trace.getEvent(i - 1);
@@ -102,15 +119,13 @@ public class MainSplit {
 		HashSet<String> SA = new HashSet<String>();
 		SA.add(aj.getFrom());
 		SA.add(aj.getTo());
-		//i++;
 		eventAnalysis:
-			while (i <= trace.size()) {
+			while (i <= trace.getSize()) {
 				aj = trace.getEvent(i - 1);
 				updateOLreq(OLReq, aj);
 				//case 1
 				ArrayList<Event> LReq = C1(SR, aj);	
 				if(LReq != null) {
-					//System.out.println("case 1 : " + aj.debug());
 					tprime.addEvent(aj);
 					OLReq.add(LReq.get(LReq.size() -1));
 					LReq.remove(LReq.size() - 1);
@@ -121,7 +136,6 @@ public class MainSplit {
 				}
 				//case 2
 				if(C2(OLReq, aj)) {
-					//System.out.println("case 2 : " + aj.debug());
 					tprime.addEvent(aj);
 					SA.add(aj.getFrom());
 					SA.add(aj.getTo());
@@ -130,8 +144,7 @@ public class MainSplit {
 				}
 				//case 3
 				LReq = C3(SR, aj);
-				if (LReq != null /*&& haveResp(trace.subTrace(i, trace.size()), LReq.get(LReq.size() - 1), aj)*/) {
-					//System.out.println("case 3 : " + aj.debug());
+				if (LReq != null) {
 					checkDependencies(tprime, aj); //make dep if not done
 					tprime.addEvent(aj);
 					LReq.add(aj);
@@ -143,7 +156,6 @@ public class MainSplit {
 				}
 				//case 4
 				if (aj.isReq() && SA.contains(aj.getFrom()) && (tprime.isEmpty() || checkTime(tprime.getEvent(0), aj) || checkDependencies(tprime, aj))) {
-					//System.out.println("case 4 : " + aj.debug());
 					checkDependencies(tprime, aj); //make dep if not done
 					tprime.addEvent(aj);
 					ArrayList<Event> LR = new ArrayList<Event>();
@@ -157,14 +169,12 @@ public class MainSplit {
 				}
 				//case 5
 				if (aj.isInter() && (tprime.isEmpty() || checkTime(tprime.getEvent(0), aj) || checkDependencies(tprime, aj) )) {
-					//System.out.println("case 5 : " + aj.debug());
 					checkDependencies(tprime, aj); //make dep if not done
 					tprime.addEvent(aj);
 					i++;
 					continue eventAnalysis;	
 				}
 				tprimeprime.addEvent(aj);
-				//System.out.println("no case : " + aj.debug());
 				i++;
 			}
 		boolean empty = true;
@@ -177,8 +187,7 @@ public class MainSplit {
 			T.add(tprime);
 		}
 		else {
-			System.out.println("not finished : " + tprime.debug());
-
+			System.out.println("not finished, there are stil pending requests: " + tprime.debug());
 		}
 		if (!tprimeprime.isEmpty()) {
 			T.addAll(Split(tprimeprime));
@@ -186,33 +195,26 @@ public class MainSplit {
 		return T;
 	}
 
+	/**
+	 * Algorithm Split that extract the traces of session and build the dependency lists.
+	 * This algorithm is used when session identifier are present in the events.
+	 * (mode: id). 
+	 */
 	public static ArrayList<Trace> SplitID(Trace trace){
 		ArrayList<Trace> T = sepID(trace);
 		HashSet<ArrayList<Event>> SR = new HashSet<ArrayList<Event>>();
-		//HashSet<Event> OLReq = new HashSet<Event>();
 		HashSet<String> SA = new HashSet<String>();
 		for (Trace t : T) {
 			int i = 1;
 			Event aj = t.getEvent(i - 1);
-			//System.out.println("new trace \n");
-			/* initialisation */
-			//ArrayList<Event> LR1 = new ArrayList<Event>();
-			//LR1.add(t.getEvent(0));
-			//SR.add(LR1);
-			//Dep.extend(LR1);
 			SA.add(aj.getFrom());
 			SA.add(aj.getTo());
 			eventAnalysis:
 				while (i <= t.getSize()) {
 					aj = t.getEvent(i - 1);
-					//SA.add(aj.getFrom());
-					//SA.add(aj.getTo());
-					//updateOLreq(OLReq, aj);
 					//case1
 					ArrayList<Event> LReq = C1(SR, aj);	
 					if(LReq != null) {
-						//System.out.println("case1");
-						//OLReq.add(LReq.get(LReq.size() -1));
 						LReq.remove(LReq.size() - 1);
 						SA.add(aj.getFrom());
 						SA.add(aj.getTo());
@@ -222,7 +224,6 @@ public class MainSplit {
 					//case 3
 					LReq = C3(SR, aj);
 					if (LReq != null) {
-						//System.out.println("case3");
 						LReq.add(aj);
 						Dep.extend(LReq); 
 						SA.add(aj.getFrom());
@@ -231,10 +232,8 @@ public class MainSplit {
 						continue eventAnalysis;			
 					}
 					//case 4
-					if (aj.isReq() && SA.contains(aj.getFrom()) && (i == 1 || checkTime(t.getEvent(0), aj) /*|| checkDependencies(t.subTrace(0, i), aj) */|| checkDependenciesID(t, t.subTrace(0, i), aj))) {
+					if (aj.isReq() && SA.contains(aj.getFrom()) && (i == 1 || checkTime(t.getEvent(0), aj) || checkDependenciesID(t, t.subTrace(0, i), aj))) {
 						checkDependenciesID(t, t.subTrace(0, i), aj); //make dep if not done
-						//checkDependencies(t.subTrace(0, i), aj);
-						//System.out.println("case4");
 						ArrayList<Event> LR = new ArrayList<Event>();
 						LR.add(aj);
 						SR.add(LR);
@@ -244,14 +243,16 @@ public class MainSplit {
 						i++;
 						continue eventAnalysis;	
 					}
-					//no case
-					//System.out.println("no case");
 					i++;
 				}
 		}
 		return T;
 	}
 
+	/**
+	 * Split the log into several traces, each representing a session,
+	 * using the session identifiers in the events.
+	 */
 	private static ArrayList<Trace> sepID(Trace trace){
 		ArrayList<Trace> res =  new ArrayList<Trace>();
 		ArrayList<String> ids = new ArrayList<String>();
@@ -259,7 +260,6 @@ public class MainSplit {
 		for (int i = 0; i < size; ++i) {
 			Event e = trace.getEvent(i);
 			String id = e.getSessionID();
-			//System.out.println(id);
 			if (!ids.contains(id)) {
 				ids.add(id);
 				res.add(new Trace());
@@ -270,6 +270,9 @@ public class MainSplit {
 		return res;
 	}
 
+	/**
+	 * Update the OLReq set
+	 */
 	private static void updateOLreq(HashSet<Event> OLReq, Event ai) {
 		HashSet<Event> Lr = new HashSet<Event>();
 		if (ai.isResp()) {
@@ -289,29 +292,11 @@ public class MainSplit {
 		OLReq.addAll(Lr);
 	}
 
-
-	/* check if the request aprime  has a response next */
-	private static boolean haveResp(Trace t, Event last, Event ai) {
-		for (int i = 0; i < t.size();++i) {
-			Event aprime = t.getEvent(i);
-			if (!aprime.isReq() && aprime.getFrom().equals(last.getTo()) && aprime.getTo().equals(last.getFrom())) {
-				return haveResp(t.subTrace(i, t.size() - 1), ai);
-			}
-		}
-		return false;
-	}
-
-	private static boolean haveResp(Trace t,  Event ai) {
-		for (int i = 0; i < t.size();++i) {
-			Event aprime = t.getEvent(i);
-			if (!aprime.isReq() && aprime.getFrom().equals(ai.getTo()) && aprime.getTo().equals(ai.getFrom())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
+	/**
+	 * Check if condition C1 is validated:
+	 * ai is a response of a pending request.
+	 * Return the list containing the request linked to the response. 
+	 */
 	private static ArrayList<Event> C1(HashSet<ArrayList<Event>> SR, Event ai){
 		if (ai.isReq()) {
 			return null;
@@ -323,7 +308,7 @@ public class MainSplit {
 				if (res == null) {
 					res = LReq;
 				}
-				else {
+				else {// has to be unique.
 					return null;
 				}
 			}
@@ -331,6 +316,10 @@ public class MainSplit {
 		return res;
 	}
 
+	/**
+	 * Check if condition C2 is validated.
+	 * Return true if ai form nested request with pending requests.
+	 */
 	private static boolean C2(HashSet<Event> OLReq, Event ai){
 		if (ai.isReq()) {
 			return false;
@@ -344,6 +333,11 @@ public class MainSplit {
 		return false;
 	}
 
+	/**
+	 * Check if condition C3 is validated.
+	 * ai is a response of a request that has already received a response.
+	 * Return the list containing the request linked to the response. 
+	 */
 	private static ArrayList<Event> C3(HashSet<ArrayList<Event>> SR, Event ai){
 		if (!ai.isReq()) {
 			return null;
@@ -356,7 +350,9 @@ public class MainSplit {
 		return null;
 	}
 
-	/* return true if from aj has a pending request */
+	/**
+	 * Return true if the source of aj has a pending request
+	 */
 	public static boolean pendingRequest(Event aj, HashSet<ArrayList<Event>> SR) {
 		for (ArrayList<Event> LReq: SR) {
 			for (Event e: LReq) {
@@ -368,22 +364,26 @@ public class MainSplit {
 		return false;
 	}
 
+	/**
+	 * Check the time between the event first and aj is lower than interval.
+	 */
 	public static boolean checkTime(Event first, Event aj) {
 		double diff = aj.getDate(regex).getTime() - first.getDate(regex).getTime();
-
 		if (diff > 0 && diff < interval) { 
 			return true;
 		}
 		return false;
 	}
 
-	/* check for data dependencies */
+	/**
+	 *  Check if there exist data dependencies in t, including the event aj 
+	 *  used in mode: classic
+	 */
 	public static boolean checkDependencies(Trace t, Event aj) {
 		ArrayList<Event> chain = new ArrayList<Event>();
 		Trace sub = logOrigin.subTrace(0,logOrigin.indexOf(aj));//
 		ArrayList<Event> dependency = new ArrayList<Event>();
 		int c = 0;
-		//ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
 		ArrayList<Event> begin = new ArrayList<Event>();
 		begin.add(aj);
 		for (@SuppressWarnings("unused") Event e: begin) {
@@ -398,13 +398,10 @@ public class MainSplit {
 		}
 		if (c == 1 && t.containsAll(dependency) && !aj.getTo().equals(dependency.get(0).getFrom())) {
 			if (!aj.isInter()) {
-				//System.out.println("haj:" + aj.toString());
-				System.out.println("here:" + dependency.toString());
 				ArrayList<String> ld = new ArrayList<String>();
 				ld.add(aj.getTo());
 				ld.add(dependency.get(0).getFrom());
 				Dep.add(ld);
-				System.out.println("dep:" + ld);
 			}
 			return true;
 		}
@@ -413,12 +410,15 @@ public class MainSplit {
 		}
 	}
 
+	/**
+	 *  Check if there exist data dependencies in t, including the event aj 
+	 *  used in mode: id
+	 */
 	public static boolean checkDependenciesID(Trace origin, Trace t, Event aj) {
 		ArrayList<Event> chain = new ArrayList<Event>();
 		Trace sub = origin.subTrace(0,origin.indexOf(aj));//
 		ArrayList<Event> dependency = new ArrayList<Event>();
 		int c = 0;
-		//ArrayList<Event> begin = sub.getEvery(aj.getFrom(), aj.getTo());
 		ArrayList<Event> begin = new ArrayList<Event>();
 		begin.add(aj);
 		for (@SuppressWarnings("unused") Event e: begin) {
@@ -433,12 +433,10 @@ public class MainSplit {
 		}
 		if (c == 1 && t.containsAll(dependency) && !aj.getTo().equals(dependency.get(0).getFrom())) {
 			if (!aj.isInter()) {
-				//System.out.println("haj:" + aj.toString());
 				ArrayList<String> ld = new ArrayList<String>();
 				ld.add(aj.getTo());
 				ld.add(dependency.get(0).getFrom());
 				Dep.add(ld);
-				System.out.println("dep:" + ld);
 			}
 			return true;
 		}
@@ -446,19 +444,20 @@ public class MainSplit {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Try to find the longest chain of event such that there is data dependency
+	 * between them, and return it if it is unique.
+	 */
 	public static ArrayList<Event> checkDependencies(Trace t, Event aj, ArrayList<Event> chain) {
-		//System.out.println(t.toString());
 		ArrayList<Event> res = new ArrayList<Event>();
 		Event aprime = null;
 		boolean one = false;
 		int j = 0;
-		for(int i = t.size() - 1 ; i >= 0; i--) {
+		for(int i = t.getSize() - 1 ; i >= 0; i--) {
 			Event e = t.getEvent(i);
-			
+
 			if (e.dataSimilarity(aj) && e.getTo().equals(aj.getFrom()) && !e.isInter() && !chain.contains(e)){
-				//System.out.println("event:" + aj.toString());
-				//System.out.println("dep:" + e.toString());
 				if (one) {
 					return new ArrayList<Event>();
 				}
@@ -478,7 +477,11 @@ public class MainSplit {
 		return res;
 	}
 
-	/* get the mean of time between request of comp */
+	/**
+	 * Get the mean of time between request of comp.
+	 * May be used to define a new CheckTime.
+	 * 
+	 */
 	public static double getMean(String comp) {
 		if (means.containsKey(comp)) {
 			return means.get(comp);
@@ -502,7 +505,6 @@ public class MainSplit {
 					}
 				}
 			}
-			System.out.println("mean(" + comp + ") : " + sum/c);
 			means.put(comp, sum/c);
 			return sum/c;
 		}

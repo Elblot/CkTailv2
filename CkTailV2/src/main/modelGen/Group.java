@@ -11,6 +11,11 @@ import traces.Statement;
 import traces.Trace;
 
 
+/**
+ * 
+ * @author Blot Elliott
+ *
+ */
 
 public class Group {
 
@@ -23,7 +28,9 @@ public class Group {
 		this.s = s;
 	}
 
-	/* group the traces that come from the same component */
+	/**
+	 *  group the traces that come from the same component 
+	 */
 	public ArrayList<ArrayList<Trace>> Synchronization() throws Exception {
 		int index = 0;
 		ArrayList<String> components = new ArrayList<String>();
@@ -41,7 +48,9 @@ public class Group {
 		return alTraces;
 	}
 
-	
+	/**
+	 * Check if the arrayList components contains compnb
+	 */
 	public static boolean NewContains(ArrayList<String> components, String compnb) {
 		for (String component : components) {
 			if (component.equals(compnb)) {
@@ -51,6 +60,9 @@ public class Group {
 		return false;
 	}
 
+	/**
+	 * Return the index of compnb in components
+	 */
 	public static int NewIndexOf(ArrayList<String> components, String compnb) {
 		int index = 0;
 		for (String component : components) {
@@ -63,7 +75,9 @@ public class Group {
 	}
 
 
-	/* get all the n of C_n */
+	/**
+	 *  return the identifier of the component represented by the trace
+	 */
 	public static String GetNumber(ArrayList<String> trace) {
 		String ID = "????";
 		String event = trace.get(0);
@@ -76,8 +90,6 @@ public class Group {
 				else {
 					ID = event.substring(h + 5, event.indexOf(")", h + 5));
 				}
-				//ID = event.substring(h + 5, event.indexOf(separator, h + 5));
-				/* 5 is the length of "Host=" */
 			}
 		}
 		else if (event.startsWith("?")) {
@@ -105,7 +117,9 @@ public class Group {
 		return ID;
 	}
 
-	//read file to stock lines in an ArrayList.
+	/**
+	 * Read file to stock lines in an ArrayList.
+	 */
 	public ArrayList<ArrayList<String>> addFileClust() throws Exception {
 		int n = 1;
 		ArrayList<ArrayList<String>> newtraces = new ArrayList<ArrayList<String>>();
@@ -144,9 +158,11 @@ public class Group {
 
 
 
-	//sort files in a ArrayList (depends of the algorithm)
+	/**
+	 * Sort files in a ArrayList
+	 */
 	public ArrayList<ArrayList<Trace>> finalClustering(int[] clusters, ArrayList<ArrayList<String>> newtraces){
-		int nbClust = Utility.maxArray(clusters);
+		int nbClust = maxArray(clusters);
 		ArrayList<ArrayList<Trace>> alTrace = new ArrayList<ArrayList<Trace>>();
 		for(int i = 0; i <= nbClust; i++) {
 			ArrayList<Trace> a = new ArrayList<Trace>();
@@ -166,9 +182,24 @@ public class Group {
 		}
 		return alTrace;
 	}
+	
+	/**
+	 * Return max value of an Array of int.
+	 */
+		public static int maxArray(int[] tab) {
+			int max = 0;
+			for (int i = 0; i < tab.length; i++) {
+				if (max < tab[i]) {
+					max = tab[i];
+				}
+			}
+			return max;
+		}
 
 
-	//read files to transform them in Trace.
+	/**
+	 * Read file to transform it in Trace.
+	 */
 	private Trace fileToTrace(String file) {
 		File f = new File(file);
 		if(!f.exists()) {

@@ -35,6 +35,8 @@ import java.util.Stack;
 import traces.Statement;
 import traces.Trace;
 /**
+ * from CARE
+ * 
  * Class representing a Finite State Automaton behavioral model. 
  * 
  * @author Nicolas Baskiotis

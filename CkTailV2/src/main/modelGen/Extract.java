@@ -9,15 +9,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Blot Elliott
+ *
+ */
+
 public class Extract {
 
 	private static ArrayList<String> identifiers = new ArrayList<String>();
 	private static String separator = "|||";
 
-	//Build the new traces corresponding of the components
+	
+	/**
+	 * Build the new traces containing the behaviour of a single component.
+	 */
 	public static String analysis(String[] traces, String fName){
 		int j = 1;
-		//String fName = createDir();
 		File x = new File(fName + "/trace");
 		x.mkdirs();
 		ArrayList<ArrayList<String>> alFiles = loadFiles(traces);
@@ -42,7 +50,6 @@ public class Extract {
 						bw.write("?" + event + "\n");
 						bw.close();
 					}
-					
 				}
 				catch (FileNotFoundException e) {
 					System.out.println("file /trace/T"+  (j+source-1) + "tmp or file /trace/T"+  (j+destination-1) + "tmp not found " + e);
@@ -57,7 +64,9 @@ public class Extract {
 		return fName + "/trace";
 	}
 
-	//build the ArrayList that contains all the identifier of the component
+	/**
+	 * Build the ArrayList that contains all the identifier of the component
+	 */
 	static void buildID(ArrayList<ArrayList<String>> files) {
 		for(ArrayList<String> alFile:files) {
 			for(int i = 0; i < alFile.size(); i++) {
@@ -73,12 +82,13 @@ public class Extract {
 		}
 	}
 
-	// get the source of the message
+	/**
+	 * Get the source of the message.
+	 */
 	private static String getSource(String sequence) {
 		String Host = "????";
 		int h = sequence.indexOf("Host=");
 		if (h != -1) { //TODO else throw exception
-			//Host = sequence.substring(h + 5, sequence.indexOf(separator, h+5));
 			if (sequence.indexOf(separator, h+5) > h) {
 				Host = sequence.substring(h + 5, sequence.indexOf(separator, h+5));
 			}
@@ -89,7 +99,9 @@ public class Extract {
 		return Host;
 	}
 
-	// get the destination of the message
+	/**
+	 * Get the destination of the message.
+	 */
 	private static String getDestination(String sequence) {
 		String Dest = "????";
 		int h = sequence.indexOf("Dest=");
@@ -104,7 +116,9 @@ public class Extract {
 		return Dest;
 	}
 
-	// read the traces and save them in an ArrayList 
+	/**
+	 * Read the traces and save them in an ArrayList.
+	 */
 	public static ArrayList<ArrayList<String>> loadFiles(String[] traces){
 		ArrayList<ArrayList<String>> alFiles = new ArrayList<ArrayList<String>>();
 		String line;
@@ -126,26 +140,4 @@ public class Extract {
 		return null;
 	}
 	
-/*
-	// create the directory that will contain the nex traces
-	private static String createDir() {
-		String tmpName = null, fName = "RESULTS/"+MainGen.dest;
-		int i = 1;
-		File x = new File(fName);
-		while(x.exists()) {
-			tmpName = fName+i;
-			x = new File(tmpName);
-			i++;
-		}
-		if (tmpName != null) {
-			fName = tmpName;
-		}
-		MainGen.dest = fName;
-
-		fName = fName+"/trace";
-		x = new File(fName);
-		x.mkdirs();
-		return fName;
-	}*/
-
 }

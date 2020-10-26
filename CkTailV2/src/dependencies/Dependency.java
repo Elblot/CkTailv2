@@ -6,8 +6,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import model.Event;
-import model.Trace;
 
+/**
+ * 
+ * @author Blot Elliott
+ *
+ */
 public class Dependency {
 
 	static ArrayList<ArrayList<String>> Dep;
@@ -18,12 +22,18 @@ public class Dependency {
 		components= new HashSet<String>();
 	}
 
+	/**
+	 * Returns the dependencies in the form of lists of components.
+	 */
 	public ArrayList<ArrayList<String>> getDependencies(){
 		return Dep;
-
 	}
 
-	/* extend procedure, add the dependency associated to the new events in l */
+	/**
+	 * Extend procedure,
+	 * Adds the dependency associated to the new events in l,
+	 * and updates the component set.
+	 */
 	public void extend(ArrayList<Event> l) {
 		ArrayList<String> ld = new ArrayList<String>();
 		for (Event e : l) {
@@ -39,8 +49,6 @@ public class Dependency {
 			}
 		}
 		if (!Dep.contains(ld)) {
-			//System.out.println("dep:" + ld);
-			//System.out.println("LReq:" + l.get(0).debug());
 			Dep.add(ld);
 		}
 	}
@@ -49,13 +57,19 @@ public class Dependency {
 		return Arrays.deepToString(Dep.toArray());
 	}
 
+	/**
+	 * Adds a dependency in the list of dependencies.
+	 * @param ld
+	 */
 	public void add(ArrayList<String> ld) {
 		if (!Dep.contains(ld)) {
 			Dep.add(ld);
 		}
 	}
 
-	/* return the dag of dependencies corresponding to the component compo */
+	/**
+	 *  Returns the DAG of dependencies corresponding to the component compo in the form of lists
+	 */
 	public ArrayList<ArrayList<String>> getDag(String compo){
 		ArrayList<ArrayList<String>> dag = new ArrayList<ArrayList<String>>();
 		for (ArrayList<String> dep : Dep) {
@@ -71,7 +85,9 @@ public class Dependency {
 	}
 
 
-	/* return all the dags in a String */
+	/**
+	 *  Returns all the DAGs in the form of lists in a String
+	 */
 	public String getDag() {
 		String res = "";
 		for (String compo : components) {
@@ -80,7 +96,9 @@ public class Dependency {
 		return res;
 	}
 
-	/* construct the dag */
+	/**
+	 *  Constructs the DAGs
+	 */
 	public void buildDAG(String output) {
 		File folder = new File(output + "/DAG");
 		folder.mkdir();

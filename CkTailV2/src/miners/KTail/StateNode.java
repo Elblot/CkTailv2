@@ -36,6 +36,7 @@ import traces.Statement;
  * 
  * @author Sylvain Lamprier
  *
+ *
  */
 public class StateNode extends State{
 	private HashMap<String, StateNode> fils; // Si pas feuille, noeud fils

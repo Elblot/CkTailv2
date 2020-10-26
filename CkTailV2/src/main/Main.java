@@ -2,6 +2,11 @@ package main;
 
 import java.io.File;
 
+/**
+ * 
+ * @author Blot Elliott
+ */
+
 public class Main {
 
 	public static String log;
@@ -9,7 +14,9 @@ public class Main {
 	public static String output;
 	static boolean timerMode;
 	public static String mode;
+
 	
+
 	public static void main(String[] args) {
 		try {
 			FullOptions.setOptions(args);
@@ -19,11 +26,15 @@ public class Main {
 		}
 		createDir();
 		String tmp = output + "/splitres";
+
+
+		//Split the log and detect the sessions and  dependencies
 		final long timeSplit1 = System.currentTimeMillis();
 		String[] argsSplit = {"-i", log, "-r", regex, "-o", tmp, mode};
 		main.split.MainSplit.main(argsSplit);
 		final long timeSplit2 = System.currentTimeMillis();
-		
+
+		//generation of the models
 		final long timeGen1 = System.currentTimeMillis();
 		String[] argsGen = {"-i", tmp+"/traces", "-o", output};
 		try {
@@ -37,26 +48,28 @@ public class Main {
 		if (timerMode) {
 			System.out.println("Split Duration: " + (timeSplit2 - timeSplit1) + " ms");
 			System.out.println("modle Generation Duration: " + (timeGen2 - timeGen1) + " ms");
-        }	
+		}	
 	}
 
-	// create the directory that will contain the nex traces
-		private static String createDir() {
-			String tmpName = null, fName = "RESULTS/" + output;
-			int i = 1;
-			File x = new File(fName);
-			while(x.exists()) {
-				tmpName = fName+i;
-				x = new File(tmpName);
-				i++;
-			}
-			if (tmpName != null) {
-				fName = tmpName;
-			}
-			output = fName;
-			x = new File(fName);
-			x.mkdirs();
-			return fName;
+	/**
+	 *Create the directory that will contain the results
+	 **/
+	private static String createDir() {
+		String tmpName = null, fName = "RESULTS/" + output;
+		int i = 1;
+		File x = new File(fName);
+		while(x.exists()) {
+			tmpName = fName+i;
+			x = new File(tmpName);
+			i++;
 		}
-	
+		if (tmpName != null) {
+			fName = tmpName;
+		}
+		output = fName;
+		x = new File(fName);
+		x.mkdirs();
+		return fName;
+	}
+
 }

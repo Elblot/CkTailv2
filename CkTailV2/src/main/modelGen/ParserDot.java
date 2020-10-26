@@ -19,12 +19,12 @@ public class ParserDot {
 	int nbEtat = 0, nbTransition = 0;
 	static int nbEtatTot, nbTransitionTot;
 
-	
+
 	public ParserDot(String j) {
 		this.j = j;
 	}
-	
-	
+
+
 	public String parser(File f) {
 		File file = new File(MainGen.dest+"/RESULTAT.txt");
 		try {
@@ -41,7 +41,6 @@ public class ParserDot {
 		}
 		String strEntier = nettoie(arStrAvecDoublon);
 		ArrayList<Integer> listInt = spliter(strEntier);
-		System.out.println(listInt);
 		Set<Integer> sInt = new TreeSet<Integer>();
 		sInt.addAll(listInt);
 		ArrayList<Integer> finalInt = new ArrayList<Integer>(sInt);
@@ -51,7 +50,7 @@ public class ParserDot {
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			resultat(file);
 		}catch(IOException e) {
@@ -61,9 +60,11 @@ public class ParserDot {
 		nbTransitionTot=nbTransitionTot+nbTransition;
 		return fileName;
 	}
-	
-	
-	//read file and stock lines in an ArrayList
+
+
+	/**
+	 * Reads the file f and stocks lines in an ArrayList.
+	 */
 	public ArrayList<String> readFile(File f) throws IOException {
 		String line;
 		ArrayList<String> tab = new ArrayList<String>();
@@ -77,9 +78,11 @@ public class ParserDot {
 		f = null;
 		return tab;
 	}
-	
-	
-	//remove duplicated string and stock them into a String
+
+
+	/**
+	 * Removes duplicated string
+	 */
 	public String nettoie(ArrayList<String> arStrAvecDoublon) {
 		Set<String> set = new LinkedHashSet<String>();
 		set.addAll(arStrAvecDoublon);	
@@ -90,37 +93,41 @@ public class ParserDot {
 		}
 		return strEntier;
 	}
-	
-	
-	//obtain state numbers in an ArrayList
-		public ArrayList<Integer> spliter(String str) {
-			String[] splited = str.split("\n");
-			ArrayList<Integer> listInt = new ArrayList<Integer>();		
-			for(String line :splited) {
-				if (line.startsWith("S")){
-					if (line.contains(" -> ")) {
-						String src = line.substring(1, line.indexOf(" -> "));
-						listInt.add(Integer.parseInt(src));
-						if (line.contains("[")) {
-							String dest = line.substring(line.indexOf(" -> ") + 5, line.indexOf("[label"));
-							listInt.add(Integer.parseInt(dest));
-						}
-						else {
-							String dest = line.substring(line.indexOf(" -> ") + 5);
-							listInt.add(Integer.parseInt(dest));
-						}
+
+
+	/**
+	 * Obtains state numbers in an ArrayList
+	 */
+	public ArrayList<Integer> spliter(String str) {
+		String[] splited = str.split("\n");
+		ArrayList<Integer> listInt = new ArrayList<Integer>();		
+		for(String line :splited) {
+			if (line.startsWith("S")){
+				if (line.contains(" -> ")) {
+					String src = line.substring(1, line.indexOf(" -> "));
+					listInt.add(Integer.parseInt(src));
+					if (line.contains("[")) {
+						String dest = line.substring(line.indexOf(" -> ") + 5, line.indexOf("[label"));
+						listInt.add(Integer.parseInt(dest));
 					}
 					else {
-						String node = line.substring(1, line.indexOf("["));
-						listInt.add(Integer.parseInt(node));
+						String dest = line.substring(line.indexOf(" -> ") + 5);
+						listInt.add(Integer.parseInt(dest));
 					}
 				}
+				else {
+					String node = line.substring(1, line.indexOf("["));
+					listInt.add(Integer.parseInt(node));
+				}
 			}
-			return listInt;
 		}
-	
-		
-	//Replace unnatural state names by new ones
+		return listInt;
+	}
+
+
+	/**
+	 * Replaces unnatural state names by new ones
+	 */
 	public String remplaceInt(ArrayList<Integer> finalInt, String strEntier) {
 		String st="";
 		for(int i = 0; i < finalInt.size(); i++) {
@@ -133,9 +140,11 @@ public class ParserDot {
 		}
 		return st;
 	}
-	
-	
-	//rewrite dot file with changes
+
+
+	/**
+	 * Rewrite dot file with changes
+	 */
 	public String ecriture(ArrayList<Integer> finalInt, String st) throws IOException {
 		String[] atrier = st.split("\n");
 		HashMap<Integer, String> intShape = new HashMap<Integer, String>();
@@ -146,7 +155,7 @@ public class ParserDot {
 				intShape.put(numero, shape);
 			}
 		}
-		
+
 		String fileName = MainGen.dest+"/dot/"+j+".dot";
 		File file = new File(fileName);
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -182,16 +191,16 @@ public class ParserDot {
 		bw.close();
 		return fileName;
 	}
-	
-	
+
+
 	public void resultat(File f) throws IOException {
 		if(!f.exists()) {
-			System.err.println("erro, folder RESULTS does not exist");
+			System.err.println("error, folder RESULTS does not exist");
 			System.exit(1);
 		}
 		BufferedWriter bw = new BufferedWriter(new FileWriter(f, true));
 		bw.write(j+".dot contains :\n"+this.nbEtat+" states\n"+this.nbTransition+" transitions\n\n");
 		bw.close();
 	}
-	
+
 }

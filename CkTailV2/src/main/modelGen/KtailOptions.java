@@ -5,6 +5,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
+/**
+ * 
+ * @author Blot Elliott
+ *
+ */
+
 public class KtailOptions {
 	
 	public static void setOptions(String[] args) throws Exception {

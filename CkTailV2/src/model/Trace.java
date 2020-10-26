@@ -10,8 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
-
 import main.split.Regex;
+
+/**
+ * @author Blot Elliott
+ *
+ */
 
 public class Trace {
 
@@ -25,6 +29,11 @@ public class Trace {
 		seq = t;
 	}
 	
+	/**
+	 * Build the trace from a file and regular expression matching the events. 
+	 * @param file
+	 * @param regex
+	 */
 	public Trace(File file, Regex regex) {
 		seq = new ArrayList<Event>();
 		try {
@@ -53,7 +62,9 @@ public class Trace {
 		}
 	}
 	
-	/* get every request with host = from */
+	/**
+	 * Return every request with host=from. 
+	 */
 	public ArrayList<Event> getEvery(String from, String to){
 		ArrayList<Event> res = new ArrayList<Event>();
 		for (Event e : getSeq()) {
@@ -64,6 +75,9 @@ public class Trace {
 		return res;
 	}
 	
+	/**
+	 * Return  the sub-trace starting at index begin and ending at end.
+	 */
 	public Trace subTrace(int begin, int end) {
 		return new Trace(new ArrayList<Event>(seq.subList(begin, end)));
 	}
@@ -81,6 +95,9 @@ public class Trace {
 		return true;
 	}
 	
+	/**
+	 * For debugging purpose, print the events.
+	 */
 	public String debug() {
 		String res = "[";
 		for (Event e : seq) {
@@ -89,7 +106,10 @@ public class Trace {
 		return res;
 	}
 	
-	public boolean complete(String comp) {
+	/**
+	 * Check if every request has a unique response in the traces
+	 */
+	/*public boolean complete(String comp) {
 		int nbReq=0;
 		int nbResp=0;
 		for (int i = 0; i < seq.size(); i++) {
@@ -104,8 +124,11 @@ public class Trace {
 			}
 		}
 		return nbReq == nbResp;
-	}
+	}*/
 	
+	/**
+	 * Write the trace in file. 
+	 */
 	public void writeTrace(File file) {
 		try {
 			BufferedWriter bw = new BufferedWriter (new FileWriter(file));
@@ -120,31 +143,52 @@ public class Trace {
 		}
 	}
 	
+	/**
+	 * Return the sequence of event of the trace.
+	 */
 	public ArrayList<Event> getSeq() {
 		//ArrayList<Event> res = new ArrayList<Event>(seq);
 		return seq;
 	}
 	
+	/**
+	 * Add the event e in the end of the trace.
+	 */
 	public void addEvent(Event e) {
 		seq.add(e);
 	}
 	
+	/** 
+	 * Check if the trace is empty.
+	 */
 	public boolean isEmpty() {
 		return seq.isEmpty();
 	}
 	
+	/**
+	 * Return the event at index.
+	 */
 	public Event getEvent(int index) {
 		return seq.get(index);
 	}
 	
+	/**
+	 * Return the index of the event e.
+	 */
 	public int indexOf(Event e) {
 		return seq.indexOf(e);
 	}
 	
+	/**
+	 * Return the size of the trace.
+	 */
 	public int getSize() {
 		return seq.size();
 	}
 	
+	/**
+	 * Return the last request send or received by comp.
+	 */
 	public Event lastReq(String comp) {
 		for (int i = seq.size()-1; i >= 0; i--) {
 			Event e = seq.get(i);
@@ -158,7 +202,4 @@ public class Trace {
 		return null;
 	}
 	
-	public int size() {
-		return seq.size();
-	}
 }

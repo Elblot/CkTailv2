@@ -32,6 +32,8 @@ import java.util.Set;
 import traces.Element;
 
 /**
+ * from CARE 
+ * 
  * Classe qui represente un etat dans un automate
  * @author Neko
  * @author LGY

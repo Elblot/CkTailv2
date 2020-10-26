@@ -8,6 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+/**
+ * 
+ * @author Blot Elliott
+ *
+ */
+
 public class DAG {
 	public ArrayList<String> nodes;
 	public HashSet<String[]> transitions;
@@ -16,7 +22,9 @@ public class DAG {
 		transitions = new HashSet<String[]>();
 	}
 
-	/* build the node of the graph once the transitions are done */
+	/**
+	 *  Build the node of the graph once the transitions are done.
+	 */
 	public void makeNodes() {
 		nodes = new ArrayList<String>();
 		for (String[] trans: transitions) {
@@ -26,14 +34,27 @@ public class DAG {
 		}
 	}
 
+	/**
+	 * Add a node in the list of nodes of the DAG.
+	 * @param node
+	 */
 	public void addNode(String node) {
 		nodes.add(node);
 	}
 
+	/**
+	 * Add several nodes in the list of nodes of the DAG.
+	 * @param node (HashSet<String>)
+	 */
 	public void addNodes(HashSet<String> node) {
 		nodes.addAll(node);
 	}
 
+	/**
+	 * Add the transition (node1, node2) to the set of transitions of the DAG.
+	 * @param node1
+	 * @param node2
+	 */
 	public void addTransition(String node1, String node2) {
 		String[] transition = {node1, node2};
 		for (String[] trans: transitions) {
@@ -44,19 +65,21 @@ public class DAG {
 		transitions.add(transition);
 	}
 
+	/**
+	 * ADD several transitions to the set of transitions of the DAG,
+	 * according to a list of component representing dependencies.
+	 * @param dep
+	 */
 	public void addTransition(ArrayList<String> dep) {
 		for (int i = 0; i < dep.size() - 1; i++) {
 			addTransition(dep.get(i), dep.get(i+1));
 		}
 	}
 
-	/** TODO **/
-	public String toString() {
-		String res= "";
-		return res;
-	}
-
-	/* write the dot file representing the DAG */
+	/**
+	 *  Write the dot file representing the DAG in filename. 
+	 *  @param filename
+	 */
 	public void dotGen(String filename) {
 		String comp = "";
 		try {
@@ -83,6 +106,7 @@ public class DAG {
 		}catch (IOException e){
 			System.out.println("error " + e);
 		}
+		
 		/* generate the pdf from the dot */ 
 		/* don't work and I don't know why */
 		String execCommand = "dot -Tpdf " + comp + ".dot -o " + comp + ".pdf";

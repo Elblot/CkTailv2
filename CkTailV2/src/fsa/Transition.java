@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 
-/**
+/** from CARE
  * 
  * Represents a transition of the automaton
  * 
@@ -138,7 +138,6 @@ public class Transition implements Serializable{
 
 	/*
 	 * Methode qui retourne une transition sous la forme d'une chaine de caractere
-	 * A REVOIR
 	 */
 	public String toString(){
 		return  "(" + sourceState + ")"

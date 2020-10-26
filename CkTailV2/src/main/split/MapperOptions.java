@@ -5,7 +5,10 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-
+/**
+ * @author Blot Elliott
+ *
+ */
 public class MapperOptions {
 	
 	public static void setOptions(String[] args) throws Exception {

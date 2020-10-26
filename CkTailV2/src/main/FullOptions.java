@@ -5,9 +5,10 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import main.split.MainSplit;
-
-
+/**
+ * @author Blot Elliott
+ *
+ */
 public class FullOptions {
 	
 	public static void setOptions(String[] args) throws Exception {
@@ -45,6 +46,7 @@ public class FullOptions {
 	    			+ "-o/-output : name of the output directory\n"
 	    			+ "Options :\n"
 	    			+ "-t\tshow the duration of each step of the program\n"
+	    			+ "-id\tuse session identifier to split the log\n"
 	    			);
 	    	System.exit(1);}
 	}

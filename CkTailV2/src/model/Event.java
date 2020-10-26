@@ -8,7 +8,10 @@ import java.util.regex.Matcher;
 
 import main.split.Regex;
 
-
+/**
+ * @author Blot Elliott
+ *
+ */
 public class Event {
 
 	public static String from = "Host";
@@ -46,21 +49,31 @@ public class Event {
 			//end of while
 		}
 	}
-
-
-
+	
+	/**
+	 * Return the label of the event.
+	 */
 	public String getLabel() {
 		return label;
 	}
 
+	/**
+	 * Return the parameters of the event, without session identifier.
+	 */
 	public ArrayList<String> getparams() {
 		return params;
 	}
 	
+	/**
+	 * Return all the parameters.
+	 */
 	public ArrayList<String> getparamsSess() {
 		return paramsSess;
 	}
 	
+	/**
+	 * Return the source of the event.
+	 */
 	public String getFrom() {
 		String res = "";
 		for (String param:params) {
@@ -73,6 +86,9 @@ public class Event {
 		return res;
 	}
 
+	/**
+	 * Return the destination of the event.
+	 */
 	public String  getTo() {
 		String res = "";
 		for (String param:params) {
@@ -85,6 +101,9 @@ public class Event {
 		return res;
 	}
 
+	/**
+	 * Return the timestamps of the event.
+	 */
 	public Date getDate(Regex regex) {
 		SimpleDateFormat sdf = regex.getSDF();
 		Date d = null;
@@ -108,6 +127,9 @@ public class Event {
 		return res;
 	}
 
+	/**
+	 * Print the event for debugging purposes.
+	 */
 	public String debug() {
 		String res = label + "(";
 		res = res + date;
@@ -117,6 +139,9 @@ public class Event {
 		return res;
 	}
 
+	/**
+	 * Check if ai has common parameters with this.
+	 */
 	public boolean dataSimilarity(Event ai) {
 		ArrayList<String> paramsi = ai.getparamsSess();
 		ArrayList<String> paramsj = this.getparamsSess();
@@ -132,7 +157,9 @@ public class Event {
 		return false;
 	}
 
-	//only for our cases
+	/**
+	 * Check if the event is a request.
+	 */
 	public boolean isReq() {
 		if (!this.toString().contains("esponse") & !this.toString().contains("Resp") & !this.toString().contains("resp") & !isInter()) {
 			//System.out.println(this);
@@ -143,6 +170,9 @@ public class Event {
 		}
 	}
 
+	/**
+	 * Check if the event is a response.
+	 */
 	public boolean isResp() {
 		if (this.toString().contains("esponse") | this.toString().contains("Resp") | this.toString().contains("resp")) {
 			return true;
@@ -152,7 +182,9 @@ public class Event {
 		}
 	}
 
-
+	/**
+	 * Check if the event is a non-communicating action.
+	 */
 	public boolean isInter() {
 		if (!this.toString().contains("Host=") | !this.toString().contains("Dest=")) {
 			return true;
@@ -166,9 +198,10 @@ public class Event {
 		}
 	}
 
-
+	/**
+	 * Return the session identifier.
+	 */
 	public String getSessionID() {
-		//String res = session.substring(this.toString().indexOf("session=") + 8);
 		return session;
 	}
 
