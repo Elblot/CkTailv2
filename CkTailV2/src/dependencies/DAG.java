@@ -29,7 +29,7 @@ public class DAG {
 		nodes = new ArrayList<String>();
 		for (String[] trans: transitions) {
 			for (String node: trans) {
-				nodes.add(node);
+				addNode(node);
 			}
 		}
 	}
@@ -39,9 +39,23 @@ public class DAG {
 	 * @param node
 	 */
 	public void addNode(String node) {
-		nodes.add(node);
+		if (!NodesContains(node)) {
+			nodes.add(node);
+		}
 	}
 
+	/**
+	 * Check if the arrayList list contains st
+	 */
+	private boolean NodesContains(String st) {
+		for (String st2 : nodes) {
+			if (st2.equals(st)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Add several nodes in the list of nodes of the DAG.
 	 * @param node (HashSet<String>)
@@ -72,7 +86,9 @@ public class DAG {
 	 */
 	public void addTransition(ArrayList<String> dep) {
 		for (int i = 0; i < dep.size() - 1; i++) {
-			addTransition(dep.get(i), dep.get(i+1));
+			for (int j= i+1; j < dep.size(); j++) {
+				addTransition(dep.get(i), dep.get(j));
+			}
 		}
 	}
 
@@ -106,10 +122,10 @@ public class DAG {
 		}catch (IOException e){
 			System.out.println("error " + e);
 		}
-		
+
 		/* generate the pdf from the dot */ 
 		/* don't work and I don't know why */
-		String execCommand = "dot -Tpdf " + comp + ".dot -o " + comp + ".pdf";
+		String execCommand = "/usr/bin/dot -Tpdf " + filename + " -O";
 		Process dotProcess;
 		try {
 			dotProcess = Runtime.getRuntime().exec(execCommand);
