@@ -97,7 +97,6 @@ public class DAG {
 	 *  @param filename
 	 */
 	public void dotGen(String filename) {
-		String comp = "";
 		try {
 			File dot = new File(filename);
 			BufferedWriter bw;
@@ -105,7 +104,6 @@ public class DAG {
 			bw.write("digraph DAG {\n");
 			for (String compo: nodes) {
 				if (filename.contains("/DAG/" + compo + ".dot")){
-					comp = compo;
 					bw.write("S" + nodes.indexOf(compo) +"[label=\"" + compo + "\",fillcolor=grey,style=filled];\n");
 				}
 				else {
